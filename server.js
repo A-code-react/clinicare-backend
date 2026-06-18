@@ -18,29 +18,32 @@ import roomRoutes from './src/routes/roomRoutes.js';
 import reportRoutes from './src/routes/reportRoutes.js';
 
 import { initializeRoles } from './src/models/Role.js';
-// Load environment variables FIRST
+
+// Load environment variables
 dotenv.config();
-console.log("MONGO_URI exists:", !!process.env.MONGO_URI);
-console.log("JWT_SECRET exists:", !!process.env.JWT_SECRET);
-console.log("CLIENT_URL:", process.env.CLIENT_URL);
-// Check if .env loaded correctly    // Connect to database
- 
-connectDB().then(() => {
-  initializeRoles();
-});
+
+// Debug logs
+console.log('MONGO_URI exists:', !!process.env.MONGO_URI);
+console.log('JWT_SECRET exists:', !!process.env.JWT_SECRET);
+console.log('CLIENT_URL:', process.env.CLIENT_URL);
+
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
-  credentials: true,
-}));
+
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    credentials: true,
+  })
+);
+
 app.use(helmet());
 app.use(morgan('dev'));
 
-// ============ ROUTES ============
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', patientRoutes);
 app.use('/api/doctors', doctorRoutes);
@@ -51,37 +54,67 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/billing', billingRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/reports', reportRoutes);
-// Health check route
+
+// Health Check
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    message: 'ClinicCare API is running', 
+  res.json({
+    status: 'OK',
+    message: 'ClinicCare API is running',
     timestamp: new Date(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
   });
 });
 
-// ============ ERROR HANDLING ============
-
-// 404 handler - for routes that don't exist
+// 404 Handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
-    message: `Route ${req.originalUrl} not found`
+    message: `Route ${req.originalUrl} not found`,
   });
 });
 
-// Global error handler - MUST have 4 parameters (err, req, res, next)
+// Global Error Handler
 app.use((err, req, res, next) => {
-  // Log error for debugging const statusCode = err.statusCode || 500;
+  console.error('Global Error:', err);
+
+  const statusCode = err.statusCode || 500;
+
   res.status(statusCode).json({
     success: false,
     message: err.message || 'Internal Server Error',
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+    stack:
+      process.env.NODE_ENV === 'development'
+        ? err.stack
+        : undefined,
   });
 });
 
-const PORT = process.env.PORT || 5000; 
+// Start Server
+const PORT = process.env.PORT || 5000;
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+
+// Database Connection
+connectDB()
+  .then(async () => {
+    console.log('✅ MongoDB Connected');
+
+    await initializeRoles();
+
+    console.log('✅ Roles Initialized');
+  })
+  .catch((err) => {
+    console.error('❌ Startup Error:', err);
+    process.exit(1);
+  });
+
+// Catch unexpected errors
+process.on('uncaughtException', (err) => {
+  console.error('❌ UNCAUGHT EXCEPTION:', err);
+});
+
+process.on('unhandledRejection', (err) => {
+  console.error('❌ UNHANDLED REJECTION:', err);
 });
