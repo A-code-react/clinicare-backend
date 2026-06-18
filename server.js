@@ -26,6 +26,18 @@ dotenv.config();
 console.log('MONGO_URI exists:', !!process.env.MONGO_URI);
 console.log('JWT_SECRET exists:', !!process.env.JWT_SECRET);
 console.log('CLIENT_URL:', process.env.CLIENT_URL);
+console.log('NODE_ENV:', process.env.NODE_ENV || 'development');
+
+// Validate required environment variables
+if (!process.env.MONGO_URI) {
+  console.error('❌ MONGO_URI is not defined in environment variables');
+  process.exit(1);
+}
+
+if (!process.env.JWT_SECRET) {
+  console.error('❌ JWT_SECRET is not defined in environment variables');
+  process.exit(1);
+}
 
 const app = express();
 
@@ -33,14 +45,18 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    credentials: true,
-  })
-);
+// CORS configuration
+const corsOptions = {
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
 
-app.use(helmet());
+app.use(cors(corsOptions));
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+}));
 app.use(morgan('dev'));
 
 // Routes
@@ -62,6 +78,7 @@ app.get('/api/health', (req, res) => {
     message: 'ClinicCare API is running',
     timestamp: new Date(),
     environment: process.env.NODE_ENV || 'development',
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
 });
 
@@ -75,46 +92,74 @@ app.use((req, res) => {
 
 // Global Error Handler
 app.use((err, req, res, next) => {
-  console.error('Global Error:', err);
+  console.error('❌ Global Error:', err);
 
   const statusCode = err.statusCode || 500;
 
   res.status(statusCode).json({
     success: false,
     message: err.message || 'Internal Server Error',
-    stack:
-      process.env.NODE_ENV === 'development'
-        ? err.stack
-        : undefined,
+    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
   });
 });
 
-// Start Server
-const PORT = process.env.PORT || 5000;
+// Import mongoose for health check
+import mongoose from 'mongoose';
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+// Start Server Function
+const startServer = async () => {
+  try {
+    // First, connect to database
+    console.log('🔄 Connecting to MongoDB...');
+    await connectDB();
+    console.log('✅ MongoDB Connected Successfully');
 
-// Database Connection
-connectDB()
-  .then(async () => {
-    console.log('✅ MongoDB Connected');
-
+    // Initialize roles
     await initializeRoles();
+    console.log('✅ Roles Initialized Successfully');
 
-    console.log('✅ Roles Initialized');
-  })
-  .catch((err) => {
-    console.error('❌ Startup Error:', err);
+    // Then start the server
+    const PORT = process.env.PORT || 5000;
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📍 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🌐 Client URL: ${process.env.CLIENT_URL || 'http://localhost:5173'}`);
+    });
+
+    // Graceful shutdown
+    const gracefulShutdown = (signal) => {
+      console.log(`\n⚠️ Received ${signal}, shutting down gracefully...`);
+      server.close(async () => {
+        console.log('🔄 Closing MongoDB connection...');
+        await mongoose.connection.close();
+        console.log('✅ MongoDB connection closed');
+        process.exit(0);
+      });
+    };
+
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+    return server;
+  } catch (error) {
+    console.error('❌ Server Startup Error:', error.message);
+    console.error('Full error:', error);
     process.exit(1);
-  });
+  }
+};
 
 // Catch unexpected errors
 process.on('uncaughtException', (err) => {
   console.error('❌ UNCAUGHT EXCEPTION:', err);
+  console.error('Stack:', err.stack);
+  process.exit(1);
 });
 
 process.on('unhandledRejection', (err) => {
   console.error('❌ UNHANDLED REJECTION:', err);
+  console.error('Stack:', err.stack);
+  process.exit(1);
 });
+
+// Start the server
+startServer();
