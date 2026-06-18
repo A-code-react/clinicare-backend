@@ -26,9 +26,7 @@ export const createRoom = async (req, res) => {
       data: room,
       message: 'Room created successfully',
     });
-  } catch (error) {
-    console.error('Error creating room:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -79,9 +77,7 @@ export const getRooms = async (req, res) => {
         pages: Math.ceil(total / limit),
       },
     });
-  } catch (error) {
-    console.error('Error getting rooms:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -94,9 +90,7 @@ export const getRoomById = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Room not found' });
     }
     res.json({ success: true, data: room });
-  } catch (error) {
-    console.error('Error getting room:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -121,9 +115,7 @@ export const updateRoom = async (req, res) => {
       data: room,
       message: 'Room updated successfully',
     });
-  } catch (error) {
-    console.error('Error updating room:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -177,9 +169,7 @@ export const assignPatient = async (req, res) => {
       data: room,
       message: `Patient ${patient.name} assigned to room ${room.roomNumber}`,
     });
-  } catch (error) {
-    console.error('Error assigning patient:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 // @desc    Discharge patient from room
@@ -225,9 +215,7 @@ export const dischargePatient = async (req, res) => {
       },
       message: `Patient ${patientName} discharged. Room bill: ₹${roomBill}`,
     });
-  } catch (error) {
-    console.error('Error discharging patient:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -243,9 +231,7 @@ export const deleteRoom = async (req, res) => {
       success: true,
       message: 'Room deleted successfully',
     });
-  } catch (error) {
-    console.error('Error deleting room:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -272,8 +258,6 @@ export const getRoomStats = async (req, res) => {
         dailyRevenue,
       },
     });
-  } catch (error) {
-    console.error('Error getting room stats:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };

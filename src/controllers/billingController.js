@@ -26,8 +26,6 @@ export const createInvoice = async (req, res) => {
       notes
     } = req.body;
 
-    console.log('Creating invoice for:', { patientId, doctorId });
-
     // Validate patient
     const patient = await Patient.findById(patientId);
     if (!patient) {
@@ -84,9 +82,7 @@ export const createInvoice = async (req, res) => {
       data: invoice,
       message: 'Invoice created successfully'
     });
-  } catch (error) {
-    console.error('Error creating invoice:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -123,6 +119,14 @@ export const getInvoices = async (req, res) => {
       if (endDate) filter.createdAt.$lte = new Date(endDate);
     }
 
+    // Role-based access
+    if (req.user.role === 'doctor') {
+      const doctor = await Doctor.findOne({ email: req.user.email });
+      if (doctor) filter.doctorId = doctor._id;
+    } else if (req.user.role === 'patient') {
+      filter.patientId = req.user.id;
+    }
+
     const skip = (page - 1) * limit;
     const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };
 
@@ -146,9 +150,7 @@ export const getInvoices = async (req, res) => {
         pages: Math.ceil(total / limit)
       }
     });
-  } catch (error) {
-    console.error('Error getting invoices:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -170,9 +172,7 @@ export const getInvoiceById = async (req, res) => {
       success: true,
       data: invoice
     });
-  } catch (error) {
-    console.error('Error getting invoice:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -223,9 +223,7 @@ export const updateInvoice = async (req, res) => {
       data: updatedInvoice,
       message: 'Invoice updated successfully'
     });
-  } catch (error) {
-    console.error('Error updating invoice:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -255,9 +253,7 @@ export const processPayment = async (req, res) => {
       data: invoice,
       message: 'Payment processed successfully'
     });
-  } catch (error) {
-    console.error('Error processing payment:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -274,9 +270,7 @@ export const deleteInvoice = async (req, res) => {
       success: true,
       message: 'Invoice deleted successfully'
     });
-  } catch (error) {
-    console.error('Error deleting invoice:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -373,9 +367,7 @@ export const getBillingStats = async (req, res) => {
       success: true,
       data: stats
     });
-  } catch (error) {
-    console.error('Error getting billing stats:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -436,9 +428,7 @@ export const generateInvoiceFromAppointment = async (req, res) => {
       data: invoice,
       message: 'Invoice generated from appointment'
     });
-  } catch (error) {
-    console.error('Error generating invoice from appointment:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 // @desc    Update invoice status (for manual status changes)
@@ -473,8 +463,6 @@ export const updateInvoiceStatus = async (req, res) => {
       data: invoice,
       message: `Invoice status updated to ${status}`
     });
-  } catch (error) {
-    console.error('Error updating invoice status:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };

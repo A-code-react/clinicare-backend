@@ -21,13 +21,7 @@ import { initializeRoles } from './src/models/Role.js';
 // Load environment variables FIRST
 dotenv.config();
 
-// Check if .env loaded correctly
-console.log('📝 Environment variables loaded:');
-console.log(`   PORT: ${process.env.PORT || 'not set'}`);
-console.log(`   MONGODB_URI: ${process.env.MONGODB_URI ? '✓ set' : '✗ not set'}`);
-console.log(`   JWT_SECRET: ${process.env.JWT_SECRET ? '✓ set' : '✗ not set'}`);
-
-// Connect to database
+// Check if .env loaded correctly    // Connect to database
 connectDB();
 connectDB().then(() => {
   initializeRoles();
@@ -77,10 +71,7 @@ app.use((req, res) => {
 
 // Global error handler - MUST have 4 parameters (err, req, res, next)
 app.use((err, req, res, next) => {
-  // Log error for debugging
-  console.error('Error:', err.message);
-  
-  const statusCode = err.statusCode || 500;
+  // Log error for debugging const statusCode = err.statusCode || 500;
   res.status(statusCode).json({
     success: false,
     message: err.message || 'Internal Server Error',
@@ -89,8 +80,4 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`\n🚀 Server running on port ${PORT}`);
-  console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 Health check: http://localhost:${PORT}/api/health\n`);
-});
+app.listen(PORT, () => {   });

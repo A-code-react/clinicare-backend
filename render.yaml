@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: clinicare-backend
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+    deploy:
+      fromRepo: https://github.com/your-username/clinicare-backend
+      branch: main

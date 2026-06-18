@@ -107,15 +107,10 @@ const prescriptionTemplates = [
 
 async function seedData() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log('✅ Connected to MongoDB');
-
-    // Clear existing data (optional - comment out if you want to keep existing)
+    await mongoose.connect(process.env.MONGODB_URI); // Clear existing data (optional - comment out if you want to keep existing)
     // await Appointment.deleteMany({});
     // await Prescription.deleteMany({});
-    // console.log('🗑️ Cleared existing appointments and prescriptions');
-
-    const createdAppointments = [];
+    // const createdAppointments = [];
     const createdPrescriptions = [];
 
     // Create all appointments
@@ -126,9 +121,7 @@ async function seedData() {
         : doctorIds[apt.doctorType];
       
       // Skip if patient index is beyond available patients
-      if (apt.patientIndex >= patientIds.length) {
-        console.log(`⚠️ Skipping appointment ${i + 1}: Patient index ${apt.patientIndex} not found`);
-        continue;
+      if (apt.patientIndex >= patientIds.length) { continue;
       }
       
       const appointment = await Appointment.create({
@@ -142,9 +135,7 @@ async function seedData() {
         notes: apt.notes
       });
       
-      createdAppointments.push(appointment);
-      console.log(`✅ Created appointment ${i + 1}/${appointmentTemplates.length}: ${appointment._id}`);
-    }
+      createdAppointments.push(appointment); }
 
     // Create prescriptions linked to appointments
     for (let i = 0; i < createdAppointments.length; i++) {
@@ -166,19 +157,8 @@ async function seedData() {
         isActive: true
       });
       
-      createdPrescriptions.push(prescription);
-      console.log(`✅ Created prescription ${i + 1}/${createdAppointments.length}: ${prescription.prescriptionNumber}`);
-    }
-
-    console.log('\n🎉 Data seeding completed!');
-    console.log(`📊 Created: ${createdAppointments.length} appointments`);
-    console.log(`📊 Created: ${createdPrescriptions.length} prescriptions`);
-    
-    process.exit(0);
-  } catch (error) {
-    console.error('❌ Error:', error.message);
-    console.error(error.stack);
-    process.exit(1);
+      createdPrescriptions.push(prescription); }   process.exit(0);
+  } catch (error) {  process.exit(1);
   }
 }
 

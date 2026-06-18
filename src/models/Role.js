@@ -32,9 +32,7 @@ const defaultRoles = [
 export const initializeRoles = async () => {
   const count = await mongoose.model('Role').countDocuments();
   if (count === 0) {
-    await mongoose.model('Role').insertMany(defaultRoles);
-    console.log('✅ Default roles created');
-  }
+    await mongoose.model('Role').insertMany(defaultRoles); }
 };
 
 export default mongoose.model('Role', roleSchema);

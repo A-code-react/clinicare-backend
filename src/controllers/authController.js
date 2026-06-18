@@ -10,10 +10,7 @@ const generateToken = (id) => {
 
 // @desc    Register user
 export const register = async (req, res) => {
-  try {
-    console.log('📝 Registration request received:', req.body);
-    
-    const { name, email, password, phone, role } = req.body;
+  try { const { name, email, password, phone, role } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ 
@@ -36,11 +33,7 @@ export const register = async (req, res) => {
       password,
       phone: phone || '',
       role: role || 'receptionist',
-    });
-
-    console.log('✅ User created:', user._id);
-
-    res.status(201).json({
+    }); res.status(201).json({
       success: true,
       data: {
         id: user._id,
@@ -50,9 +43,7 @@ export const register = async (req, res) => {
         token: generateToken(user._id),
       },
     });
-  } catch (error) {
-    console.error('❌ Registration error:', error);
-    res.status(500).json({ 
+  } catch (error) { res.status(500).json({ 
       success: false, 
       message: error.message 
     });
@@ -61,10 +52,7 @@ export const register = async (req, res) => {
 
 // @desc    Login user - FIXED VERSION
 export const login = async (req, res) => {
-  try {
-    console.log('📝 Login request received:', req.body.email);
-    
-    const { email, password } = req.body;
+  try { const { email, password } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({ 
@@ -94,11 +82,7 @@ export const login = async (req, res) => {
 
     // Update last login
     user.lastLogin = new Date();
-    await user.save();
-
-    console.log('✅ User logged in:', user._id);
-
-    res.json({
+    await user.save(); res.json({
       success: true,
       data: {
         id: user._id,
@@ -108,9 +92,7 @@ export const login = async (req, res) => {
         token: generateToken(user._id),
       },
     });
-  } catch (error) {
-    console.error('❌ Login error:', error);
-    res.status(500).json({ 
+  } catch (error) { res.status(500).json({ 
       success: false, 
       message: error.message 
     });

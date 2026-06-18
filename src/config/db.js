@@ -9,13 +9,8 @@ const connectDB = async () => {
     }
     
     // Remove deprecated options for Mongoose v8+
-    const conn = await mongoose.connect(mongoURI);
-    
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-    return conn;
-  } catch (error) {
-    console.error(`❌ MongoDB Connection Error: ${error.message}`);
-    process.exit(1);
+    const conn = await mongoose.connect(mongoURI); return conn;
+  } catch (error) { process.exit(1);
   }
 };
 

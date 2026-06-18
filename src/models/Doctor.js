@@ -55,6 +55,11 @@ const doctorSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    sparse: true,
+  },
 }, {
   timestamps: true,
 });

@@ -80,6 +80,14 @@ export const getPrescriptions = async (req, res) => {
       if (endDate) filter.createdAt.$lte = new Date(endDate);
     }
 
+    // Role-based access
+    if (req.user.role === 'doctor') {
+      const doctor = await Doctor.findOne({ email: req.user.email });
+      if (doctor) filter.doctorId = doctor._id;
+    } else if (req.user.role === 'patient') {
+      filter.patientId = req.user.id;
+    }
+
     // Pagination
     const skip = (page - 1) * limit;
     const sort = { [sortBy]: sortOrder === 'asc' ? 1 : -1 };

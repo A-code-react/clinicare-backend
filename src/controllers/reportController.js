@@ -118,9 +118,7 @@ export const getDashboardStats = async (req, res) => {
         }
       }
     });
-  } catch (error) {
-    console.error('Error in getDashboardStats:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -187,9 +185,7 @@ export const getRevenueAnalytics = async (req, res) => {
         }
       }
     });
-  } catch (error) {
-    console.error('Error in getRevenueAnalytics:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -278,9 +274,7 @@ export const getPatientAnalytics = async (req, res) => {
         }
       }
     });
-  } catch (error) {
-    console.error('Error in getPatientAnalytics:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -410,9 +404,7 @@ export const getAppointmentAnalytics = async (req, res) => {
         }))
       }
     });
-  } catch (error) {
-    console.error('Error in getAppointmentAnalytics:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -501,9 +493,7 @@ export const getDoctorPerformance = async (req, res) => {
         }
       }
     });
-  } catch (error) {
-    console.error('Error in getDoctorPerformance:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -550,9 +540,7 @@ export const getTopServices = async (req, res) => {
       success: true,
       data: topServices
     });
-  } catch (error) {
-    console.error('Error in getTopServices:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -622,9 +610,7 @@ export const exportReport = async (req, res) => {
       data: exportData,
       count: exportData.length
     });
-  } catch (error) {
-    console.error('Error in exportReport:', error);
-    res.status(500).json({ success: false, message: error.message });
+  } catch (error) { res.status(500).json({ success: false, message: error.message });
   }
 };
 
